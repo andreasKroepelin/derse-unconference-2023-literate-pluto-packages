@@ -36,18 +36,79 @@ using PlutoUI
 using PlutoTest
   ╠═╡ =#
 
+# ╔═╡ d08b694a-3355-4750-b812-76ef55d2df04
+md"""
+# My implementation of Differential Equation Solving
+
+This notebook serves as a demonstration of how to develop Julia packages _inside_ interactive Pluto.jl notebooks.
+"""
+
+# ╔═╡ 9fe9e48f-6acb-4994-aa38-7ba05336703f
+md"""
+To enable this workflow, we rely on the `PlutoDevMacros` package.
+"""
+
+# ╔═╡ aaee3006-3dd4-44b9-a4d1-3bdf3ca837b9
+md"""
+It lets us include code from other notebooks that are part of this package.
+"""
+
+# ╔═╡ 129c56c2-adc3-4979-99a7-6c1ec533944b
+md"""
+Let us now implement the _Euler method_ for solving ordinary differential equations.
+
+Given an initial value problem
+```math
+\frac{\mathrm{d}x}{\mathrm{d}t} = f(x), \quad x(t_0) = x_0
+```
+it makes use of the approximation
+```math
+\frac{x_\text{next} - x_\text{prev}}{\Delta t} \approx f(x_\text{prev})
+```
+for small enough ``\Delta t``.
+Rearranging yields:
+```math
+x_\text{next} \approx x_\text{prev} + \Delta t \cdot f(x_\text{prev})
+```
+As Julia code, this could look like the following:
+"""
+
 # ╔═╡ 00ab19bc-5241-11ee-1934-c5b6418d55aa
-function solve(f, x0, t0, dt, t1)
+"""
+	solve(f; x0, t0, Δt, t1)
+
+Solves the initial value problem `dx/dt = f(x), x(t0) = x0` from `t = t0` to `t = t1` in time steps of `Δt`.
+"""
+function solve(f; x0, t0, Δt, t1)
 	x = x0
 	xs = [x0]
 	ts = [t0]
-	for t in t0+dt : dt : t1
-		x += dt * f(x, t)
+	for t in t0+Δt : Δt : t1
+		x += Δt * f(x)
 		push!(xs, x)
 		push!(ts, t)
 	end
 	Solution(ts, xs)
 end
+
+# ╔═╡ 1f45300c-3344-4e6a-8d69-bc8947d4b303
+btn_svg = """
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" width="16" height="16"><circle cx="256" cy="256" r="26"/><circle cx="346" cy="256" r="26"/><circle cx="166" cy="256" r="26"/><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192Z" style="fill:none;stroke:#000;stroke-miterlimit:10;stroke-width:32px"/></svg>
+""";
+
+# ╔═╡ 4aec16b8-bb2c-4d9d-8d8f-4589a259e32a
+md"""
+Now, we don't just want to provide an implementation but also explore our code.
+Users of our package, on the other hand, will in general not be interested in our exploration.
+That is why many of the following cells have a **prominent right border**, indicating that the respective cell is only run as part of the notebook but is disabled when run as a file.
+You can click on the $(HTML(btn_svg)) button in the top right corner of a code cell to change that.
+"""
+
+# ╔═╡ c9add991-2d2a-461c-b16b-c983c567b005
+md"""
+For example, the following cell loads the `Rotations` package to simplify some testing of our solver later.
+However, `Rotations` is only a dependency of this notebook, *not of our package*!
+"""
 
 # ╔═╡ 0f23c735-cefd-4e11-aa3b-2c44ba8f9189
 #=╠═╡
@@ -74,9 +135,9 @@ settings!(
 # ╔═╡ cdffad95-26c1-46c7-af90-c643a2a32199
 #=╠═╡
 sol = solve(
-	(x, _) -> Angle2d(α) * x,
-	[1., 0.],
-	0., dt, 11.
+	x -> Angle2d(α) * x;
+	x0 = [1., 0.],
+	t0 = 0., Δt = dt, t1 = 11.
 )
   ╠═╡ =#
 
@@ -98,7 +159,7 @@ Plot(
 #=╠═╡
 @test all(
 	diff(
-		solve((x, _) -> -x, 1., 0., .1, 1.).xs
+		solve(x -> -x, x0 = 1., t0 = 0., Δt = .1, t1 = 1.).xs
 	)
 	.< 0
 )
@@ -482,9 +543,16 @@ version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
+# ╟─d08b694a-3355-4750-b812-76ef55d2df04
+# ╟─9fe9e48f-6acb-4994-aa38-7ba05336703f
 # ╠═282235da-a70d-433c-8a5d-bda7880cb461
+# ╟─aaee3006-3dd4-44b9-a4d1-3bdf3ca837b9
 # ╠═c80c39a6-454a-4fb1-9631-4c5f197d5885
+# ╟─129c56c2-adc3-4979-99a7-6c1ec533944b
 # ╠═00ab19bc-5241-11ee-1934-c5b6418d55aa
+# ╟─1f45300c-3344-4e6a-8d69-bc8947d4b303
+# ╟─4aec16b8-bb2c-4d9d-8d8f-4589a259e32a
+# ╟─c9add991-2d2a-461c-b16b-c983c567b005
 # ╠═404be5e1-0997-456e-a54d-f36444df8985
 # ╠═cdffad95-26c1-46c7-af90-c643a2a32199
 # ╠═59f4db11-dff7-49e4-8f42-f91c7e626f80
