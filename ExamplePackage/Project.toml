@@ -1,0 +1,13 @@
+name = "ExamplePackage"
+uuid = "fb9b1c4e-4ccc-43d8-9ab9-58fb1f8e8fcc"
+authors = ["Wolfhart Feldmeier <wolfhart.feldmeier@uni-jena.de> and contributors"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
