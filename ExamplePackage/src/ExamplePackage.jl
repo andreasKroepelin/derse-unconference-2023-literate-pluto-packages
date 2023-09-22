@@ -1,5 +1,10 @@
 module ExamplePackage
 
+"""
+    dot(x, y)
+
+Compute the dot product between `x` and `y`
+"""
 function dot(x, y)
     result = zero(eltype(x))
 
