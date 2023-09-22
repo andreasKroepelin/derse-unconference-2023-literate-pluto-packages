@@ -3,7 +3,7 @@
 ## Plan for the workshop
 
 * [Crashcourse on Julia](#julia-in-5-minutes) (depending on the prior knowledge of the audience)
-* [Software packages in julia](#julia-packages)
+* [Software packages in Julia](#julia-packages)
 * [Introducing Pluto notebooks](#pluto-notebooks)
 * [Literate package development using notebooks](#creating-a-julia-package-made-of-notebooks)
 
@@ -42,7 +42,7 @@ winget install julia -s msstore
 ```bash
 julia
 ```
-![alt text](images/REPL.png "Screenshot of the julia REPL")
+![alt text](images/REPL.png "Screenshot of the Julia REPL")
 
 ## Julia packages
 
@@ -50,18 +50,18 @@ julia
 
 Julia package management ist built around environments. We will explore
 
-* what defines an environment in julia
+* what defines an environment in Julia
 * how to create different environments for different projects
 * how to install public and private packages in an environment
 
-More information can be found in the [manual for julia's included package manager](https://pkgdocs.julialang.org/v1/)
+More information can be found in the [manual for Julia's included package manager](https://pkgdocs.julialang.org/v1/)
 
 ### Creating a Julia package
 
-We will create a [small julia package](./ExamplePackage/) and learn
+We will create a [small Julia package](./ExamplePackage/) and learn
 
-* what defines a julia package
-* how to build a fully functional julia package
+* what defines a Julia package
+* how to build a fully functional Julia package
 * how to test our package
 * how to use our new package
 
@@ -70,7 +70,7 @@ we will **not** discuss in detail:
 * [how to publish our package](https://github.com/JuliaRegistries)
 * [CI etc.](https://github.com/JuliaCI/)
 * [documentation](https://documenter.juliadocs.org/stable/)
-* [how to include non-julia binaries, data, etc. in our package](https://pkgdocs.julialang.org/v1/artifacts/)
+* [how to include non-Julia binaries, data, etc. in our package](https://pkgdocs.julialang.org/v1/artifacts/)
 
 ## Pluto notebooks
 
@@ -82,7 +82,7 @@ we will **not** discuss in detail:
     adding interactivity (PlutoUI.jl)
     exporting static HTML
 
-## Creating a julia package made of notebooks
+## Creating a Julia package made of notebooks
 
 ### combining different files/notebooks using PlutoDevMacros.jl
 
