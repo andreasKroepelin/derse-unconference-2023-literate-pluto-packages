@@ -3,16 +3,9 @@
 ## Plan for the workshop
 
 * [Crashcourse on Julia](#julia-in-5-minutes) (depending on the prior knowledge of the audience)
-* package management in Julia and the typical structure of a package
-* introducing Pluto notebooks:
-    writing code
-    adding text
-    visualising results
-    adding interactivity (PlutoUI.jl)
-    exporting static HTML
-* combining different files/notebooks using PlutoLinks.jl and PlutoDevMacros.jl
-* integrating interactive tests using PlutoTest.jl
-developing an example package using what we learned
+* [Software packages in julia](#julia-packages)
+* [Introducing Pluto notebooks](#pluto-notebooks)
+* [Literate package development using notebooks](#creating-a-julia-package-made-of-notebooks)
 
 ## Julia in 5 minutes
 
@@ -33,17 +26,16 @@ set -U fish_user_paths ~/.juliaup/bin $fish_user_paths
 
 Fore more details on `juliaup`, visit https://github.com/JuliaLang/juliaup
 </details>
-
-#### Windows
-```bash
-winget install julia -s msstore
-```
-
 <details>
 <summary>or  if you prefer a more manual process, expand this section</summary>
 
 got to https://julialang.org/downloads/, download the right archive for your system, extract it and add the contained `bin` directory to your `$PATH`
 </details>
+
+#### Windows
+```bash
+winget install julia -s msstore
+```
 
 ### Start Julia
 
@@ -52,4 +44,46 @@ julia
 ```
 ![alt text](images/REPL.png "Screenshot of the julia REPL")
 
-## Creating a Julia package
+## Julia packages
+
+### Package management
+
+Julia package management ist built around environments. We will explore
+
+* what defines an environment in julia
+* how to create different environments for different projects
+* how to install public and private packages in an environment
+
+More information can be found in the [manual for julia's included package manager](https://pkgdocs.julialang.org/v1/)
+
+### Creating a Julia package
+
+We will create a [small julia package](./ExamplePackage/) and learn
+
+* what defines a julia package
+* how to build a fully functional julia package
+* how to test our package
+* how to use our new package
+
+we will **not** discuss in detail:
+
+* [how to publish our package](https://github.com/JuliaRegistries)
+* [CI etc.](https://github.com/JuliaCI/)
+* [documentation](https://documenter.juliadocs.org/stable/)
+* [how to include non-julia binaries, data, etc. in our package](https://pkgdocs.julialang.org/v1/artifacts/)
+
+## Pluto notebooks
+
+### Running pluto
+
+    writing code
+    adding text
+    visualising results
+    adding interactivity (PlutoUI.jl)
+    exporting static HTML
+
+## Creating a julia package made of notebooks
+
+### combining different files/notebooks using PlutoDevMacros.jl
+
+### Interactive tests using PlutoTest.jl

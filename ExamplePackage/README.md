@@ -9,6 +9,8 @@ A quick overview of the most important files
 * `Project.toml` contains package metadata such as
     * Package name and version (relevant for julia's built-in package manager)
     * Dependencies and constraints
+
+  and defines the package **environment** toghether with the next file:
 * `Manifest.toml` current manifestation of the package environment **for the local checkout** (this is normally not checked in to version control)
 * `test/runtests.jl` a julia script that serves as the entry point for tests. Tests can then be simply run by a single command in the julia REPL:
 
@@ -20,8 +22,10 @@ A quick overview of the most important files
 
     ```julia
     module ExamplePackage
-    include("other_file.jl")
-    include("yet_another_file.jl")
+    using SomePackage, AnotherPackage  # imports dependencies
+
+    include("code_file.jl")
+    include("another_code_file.jl")
     ...
     end  # module
     ```
