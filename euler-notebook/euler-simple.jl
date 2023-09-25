@@ -4,50 +4,33 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 282235da-a70d-433c-8a5d-bda7880cb461
-using PlutoDevMacros
-
-# ╔═╡ c80c39a6-454a-4fb1-9631-4c5f197d5885
-@fromparent begin
-	using ..MyDiffEq: Solution, tmin, tmax
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
 end
 
-# ╔═╡ 59f4db11-dff7-49e4-8f42-f91c7e626f80
-# ╠═╡ skip_as_script = true
-#=╠═╡
+# ╔═╡ 69910123-e70c-4cbf-bbff-6747b62e8980
+using LinearInterpolations
+
+# ╔═╡ a764fcd0-04cc-49e1-a5d4-df08a20b8716
 using PlutoPlotly
-  ╠═╡ =#
 
-# ╔═╡ 836019af-e493-4e14-81e8-61e4ca65831e
-# ╠═╡ skip_as_script = true
-#=╠═╡
-using PlutoUI 
-  ╠═╡ =#
+# ╔═╡ 5ff47949-68d2-4632-8666-4ca7d340595e
+using PlutoUI
 
-# ╔═╡ 6d8b6d57-d529-45d8-9e7c-e4df2cfccd62
-# ╠═╡ skip_as_script = true
-#=╠═╡
-using PlutoTest
-  ╠═╡ =#
-
-# ╔═╡ d08b694a-3355-4750-b812-76ef55d2df04
+# ╔═╡ 1e2864a8-40f3-45fa-96b4-1e5db6c96bed
 md"""
 # My implementation of Differential Equation Solving
 
-This notebook serves as a demonstration of how to develop Julia packages _inside_ interactive Pluto.jl notebooks.
+This notebook serves as a demonstration of Pluto.jl notebooks.
 """
 
-# ╔═╡ 9fe9e48f-6acb-4994-aa38-7ba05336703f
-md"""
-To enable this workflow, we rely on the `PlutoDevMacros` package.
-"""
-
-# ╔═╡ aaee3006-3dd4-44b9-a4d1-3bdf3ca837b9
-md"""
-It lets us include code from other notebooks that are part of this package.
-"""
-
-# ╔═╡ 129c56c2-adc3-4979-99a7-6c1ec533944b
+# ╔═╡ 314417f3-e3af-405f-b9ee-b274f6aaafa7
 md"""
 Let us implement the _Euler method_ for solving ordinary differential equations.
 
@@ -67,13 +50,8 @@ x_\text{next} \approx x_\text{prev} + \Delta t \cdot f(x_\text{prev})
 As Julia code, this could look like the following:
 """
 
-# ╔═╡ 00ab19bc-5241-11ee-1934-c5b6418d55aa
-"""
-	solve(f; x0, t0, Δt, t1)
-
-Solves the initial value problem `dx/dt = f(x), x(t0) = x0` from `t = t0` to `t = t1` in time steps of `Δt`.
-"""
-function solve(f; x0, t0, Δt, t1)
+# ╔═╡ 70a95f8a-12dc-4b79-a12c-f1ceef92981f
+function solve_raw(f; x0, t0, Δt, t1)
 	x = x0
 	xs = [x0]
 	ts = [t0]
@@ -82,85 +60,134 @@ function solve(f; x0, t0, Δt, t1)
 		push!(xs, x)
 		push!(ts, t)
 	end
-	Solution(ts, xs)
+
+	(;ts, xs)
 end
 
-# ╔═╡ 1f45300c-3344-4e6a-8d69-bc8947d4b303
-btn_svg = """
-<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" width="16" height="16"><circle cx="256" cy="256" r="26"/><circle cx="346" cy="256" r="26"/><circle cx="166" cy="256" r="26"/><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192Z" style="fill:none;stroke:#000;stroke-miterlimit:10;stroke-width:32px"/></svg>
-""";
-
-# ╔═╡ 4aec16b8-bb2c-4d9d-8d8f-4589a259e32a
+# ╔═╡ 69a34fdf-e15c-4a5c-9249-a8106a80a489
 md"""
-Now, we don't just want to provide an implementation but also explore our code.
-Users of our package, on the other hand, will in general not be interested in our exploration.
-That is why many of the following cells have a **prominent right border**, indicating that the respective cell is only run as part of the notebook but is disabled when run as a file.
-You can click on the $(HTML(btn_svg)) button in the top right corner of a code cell to change that.
+Let us test this implementation on a very simple problem:
+```math
+\dot{x} = -x
+\qquad
+x(0) = 2
+```
 """
 
-# ╔═╡ e4ee916a-b393-42e0-b639-be136348fa96
-#=╠═╡
-layout = Layout(yaxis = attr(scaleanchor = "x"))
-  ╠═╡ =#
-
-# ╔═╡ ac2395b5-9cee-432e-be5b-8d39c2fb03f2
-#=╠═╡
-@bind α Slider(.01:.01:2pi, show_value = true, default = pi/2)
-  ╠═╡ =#
-
-# ╔═╡ e307bc65-a7a6-4974-8d5a-a5776324a2f1
-#=╠═╡
-@bind dt Slider(0.0001:0.01:1)
-  ╠═╡ =#
-
-# ╔═╡ cdffad95-26c1-46c7-af90-c643a2a32199
-#=╠═╡
-sol = solve(
-	x -> [cos(α) -sin(α); sin(α) cos(α)] * x;
-	x0 = [1., 0.],
-	t0 = 0., Δt = dt, t1 = 11.
+# ╔═╡ c9ba7552-0a62-4425-9150-5ad3fd8ac5da
+sol = solve_raw(
+	x -> -x;
+	x0 = 2.,
+	t0 = 0., Δt = .1, t1 = 11.
 )
-  ╠═╡ =#
 
-# ╔═╡ 6c7d0ed7-fedf-430d-9e4f-1a5fbf91ad2e
-# ╠═╡ skip_as_script = true
-#=╠═╡
-plotting_times = tmin(sol) : .1 : tmax(sol)
-  ╠═╡ =#
+# ╔═╡ 589fe43b-5f30-4081-9433-c89f286432c9
+md"""
+The solution should come close to zero.
+"""
 
-# ╔═╡ 2cef178b-ad44-414a-a446-029af8f2679c
-#=╠═╡
+# ╔═╡ c8782cb3-d42a-40f6-a788-8163025e9c50
+last(sol.xs)
+
+# ╔═╡ 37f90e79-4150-48ec-b34f-18bd0331bd17
+md"""
+## Interpolation
+We used a time step of `.1` for the algorithm but what if we want to evaluate the solution at other points in time than the integration nodes?
+
+Let us implement a wrapper around the raw `xs` and `ts` arrays from before that allows for interpolation:
+"""
+
+# ╔═╡ ecc33216-47f2-4c28-8ff7-2d74f102240c
+begin
+struct Solution
+	ts::Vector{<: Real}
+	xs::Vector
+	interp::Interpolate
+
+	Solution(ts, xs) = new(ts, xs, Interpolate(ts, xs))
+end
+
+(sol::Solution)(t) = sol.interp(t)
+	
+end
+
+# ╔═╡ c609c2c8-5dae-43a3-9c69-0ef6ef94c7ff
+md"""
+Let us see this in action.
+"""
+
+# ╔═╡ 9c9b5d86-c387-4ecb-a151-530d628aeb74
+sol_finegrained = Solution(sol.ts, sol.xs)
+
+# ╔═╡ ad192426-69a3-49a1-8f97-c1eaf8894bfb
+md"""
+We can call this object like a function to obtain values at arbitrary time steps along the integration interval.
+"""
+
+# ╔═╡ a4e516f6-2e79-4411-a6d9-66ad0df86791
+sol_finegrained(.05)
+
+# ╔═╡ dce5d1b9-40dc-43bc-b496-3faf152c4909
+md"""
+We can write a new `solve` function that automatically wraps its output in a `Solution`:
+"""
+
+# ╔═╡ 4b1c8642-0d43-4765-8bd1-c55fe5309f22
+"""
+	solve(f; x0, t0, Δt, t1)
+
+Solves the initial value problem `dx/dt = f(x), x(t0) = x0` from `t = t0` to `t = t1` in time steps of `Δt`.
+"""
+function solve(f; x0, t0, Δt, t1)
+	s = solve_raw(f; x0, t0, Δt, t1)
+	Solution(s.ts, s.xs)
+end
+
+# ╔═╡ 6d08a15a-b878-4ad0-93a6-15595e3e097b
+md"""
+## Plotting
+Now, let us plot our solution!
+"""
+
+# ╔═╡ 4567e8ca-003b-4128-a778-1d4dd421fdfa
+plotting_times = 0:.01:10
+
+# ╔═╡ a49fabdd-b34f-4ad4-97cc-3b85a60e6487
 plot(
-	scatter(
-		x = [x[1] for x in sol.(plotting_times)],
-		y = [x[2] for x in sol.(plotting_times)],
-	),
-	layout
+	scatter(x = plotting_times, y = sol_finegrained.(plotting_times))
 )
-  ╠═╡ =#
 
-# ╔═╡ 6547f672-83a8-45fe-8395-2913136a3f92
-#=╠═╡
-@test all(
-	diff(
-		solve(x -> -x, x0 = 1., t0 = 0., Δt = .1, t1 = 1.).xs
-	)
-	.< 0
+# ╔═╡ 231baeb1-1b04-4cc2-a061-59e6d7ca0980
+md"""
+## Interactivity
+We can also make all this interactive!
+"""
+
+# ╔═╡ a190ae62-c605-477d-825a-4f024cfa6dc6
+@bind rate Slider(1:.1:5, show_value = true)
+
+# ╔═╡ 09871353-2148-40b8-8d16-16373f827fba
+sol_variable = solve(
+	x -> -rate * x;
+	x0 = 2.,
+	t0 = 0., Δt = .1, t1 = 11.
 )
-  ╠═╡ =#
+
+# ╔═╡ 662b4c82-de3d-43cc-b20a-db9d9c898f2a
+plot(
+	scatter(x = plotting_times, y = sol_variable.(plotting_times))
+)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-PlutoDevMacros = "a0499f29-c39b-4c5c-807c-88074221b949"
+LinearInterpolations = "b20c7882-2490-4592-a606-fbbfe9e745e8"
 PlutoPlotly = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
-PlutoTest = "cb4044da-4d16-4ffa-a6a3-8cad7f73ebdc"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
-PlutoDevMacros = "~0.5.8"
+LinearInterpolations = "~0.1.6"
 PlutoPlotly = "~0.3.9"
-PlutoTest = "~0.2.2"
 PlutoUI = "~0.7.52"
 """
 
@@ -170,13 +197,28 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.0"
 manifest_format = "2.0"
-project_hash = "c88c72d5a20a32238062ceb85be581e6ee819cbd"
+project_hash = "f894da6203532736132a0370ad486c1025d83d00"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
 git-tree-sha1 = "91bd53c39b9cbfb5ef4b015e8b582d344532bd0a"
 uuid = "6e696c72-6542-2067-7265-42206c756150"
 version = "1.2.0"
+
+[[deps.Adapt]]
+deps = ["LinearAlgebra", "Requires"]
+git-tree-sha1 = "76289dc51920fdc6e0013c872ba9551d54961c24"
+uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
+version = "3.6.2"
+weakdeps = ["StaticArrays"]
+
+    [deps.Adapt.extensions]
+    AdaptStaticArraysExt = "StaticArrays"
+
+[[deps.ArgCheck]]
+git-tree-sha1 = "a3a402a35a2f7e0b87828ccabbd5ebfbebe356b4"
+uuid = "dce04be8-c92d-5529-be00-80e4d2c0e197"
+version = "2.3.0"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -312,6 +354,12 @@ uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
+[[deps.LinearInterpolations]]
+deps = ["Adapt", "ArgCheck", "StaticArrays"]
+git-tree-sha1 = "aae00c2026735299eabe4ba71e5b2eec0ebf2273"
+uuid = "b20c7882-2490-4592-a606-fbbfe9e745e8"
+version = "0.1.6"
+
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
@@ -319,12 +367,6 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
 uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
 version = "0.1.4"
-
-[[deps.MacroTools]]
-deps = ["Markdown", "Random"]
-git-tree-sha1 = "9ee1618cbf5240e6d4e0371d6f24065083f60c48"
-uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
-version = "0.5.11"
 
 [[deps.Markdown]]
 deps = ["Base64"]
@@ -385,12 +427,6 @@ git-tree-sha1 = "56baf69781fc5e61607c3e46227ab17f7040ffa2"
 uuid = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
 version = "0.8.19"
 
-[[deps.PlutoDevMacros]]
-deps = ["HypertextLiteral", "InteractiveUtils", "MacroTools", "Markdown", "Pkg", "Random", "TOML"]
-git-tree-sha1 = "6ce1d9f7c078b493812161349c48735dee275466"
-uuid = "a0499f29-c39b-4c5c-807c-88074221b949"
-version = "0.5.8"
-
 [[deps.PlutoPlotly]]
 deps = ["AbstractPlutoDingetjes", "Colors", "Dates", "HypertextLiteral", "InteractiveUtils", "LaTeXStrings", "Markdown", "PackageExtensionCompat", "PlotlyBase", "PlutoUI", "Reexport"]
 git-tree-sha1 = "9a77654cdb96e8c8a0f1e56a053235a739d453fe"
@@ -402,12 +438,6 @@ version = "0.3.9"
 
     [deps.PlutoPlotly.weakdeps]
     PlotlyKaleido = "f2990250-8cf9-495f-b13a-cce12b45703c"
-
-[[deps.PlutoTest]]
-deps = ["HypertextLiteral", "InteractiveUtils", "Markdown", "Test"]
-git-tree-sha1 = "17aa9b81106e661cffa1c4c36c17ee1c50a86eda"
-uuid = "cb4044da-4d16-4ffa-a6a3-8cad7f73ebdc"
-version = "0.2.2"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
@@ -463,6 +493,21 @@ uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 [[deps.SparseArrays]]
 deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+
+[[deps.StaticArrays]]
+deps = ["LinearAlgebra", "Random", "StaticArraysCore"]
+git-tree-sha1 = "51621cca8651d9e334a659443a74ce50a3b6dfab"
+uuid = "90137ffa-7385-5640-81b9-e52037218182"
+version = "1.6.3"
+weakdeps = ["Statistics"]
+
+    [deps.StaticArrays.extensions]
+    StaticArraysStatisticsExt = "Statistics"
+
+[[deps.StaticArraysCore]]
+git-tree-sha1 = "36b3d696ce6366023a0ea192b4cd442268995a0d"
+uuid = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+version = "1.4.2"
 
 [[deps.Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
@@ -538,24 +583,30 @@ version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─d08b694a-3355-4750-b812-76ef55d2df04
-# ╟─9fe9e48f-6acb-4994-aa38-7ba05336703f
-# ╠═282235da-a70d-433c-8a5d-bda7880cb461
-# ╟─aaee3006-3dd4-44b9-a4d1-3bdf3ca837b9
-# ╠═c80c39a6-454a-4fb1-9631-4c5f197d5885
-# ╟─129c56c2-adc3-4979-99a7-6c1ec533944b
-# ╠═00ab19bc-5241-11ee-1934-c5b6418d55aa
-# ╟─1f45300c-3344-4e6a-8d69-bc8947d4b303
-# ╟─4aec16b8-bb2c-4d9d-8d8f-4589a259e32a
-# ╠═cdffad95-26c1-46c7-af90-c643a2a32199
-# ╠═59f4db11-dff7-49e4-8f42-f91c7e626f80
-# ╠═836019af-e493-4e14-81e8-61e4ca65831e
-# ╠═6c7d0ed7-fedf-430d-9e4f-1a5fbf91ad2e
-# ╠═e4ee916a-b393-42e0-b639-be136348fa96
-# ╠═2cef178b-ad44-414a-a446-029af8f2679c
-# ╠═ac2395b5-9cee-432e-be5b-8d39c2fb03f2
-# ╠═e307bc65-a7a6-4974-8d5a-a5776324a2f1
-# ╠═6d8b6d57-d529-45d8-9e7c-e4df2cfccd62
-# ╠═6547f672-83a8-45fe-8395-2913136a3f92
+# ╟─1e2864a8-40f3-45fa-96b4-1e5db6c96bed
+# ╟─314417f3-e3af-405f-b9ee-b274f6aaafa7
+# ╠═70a95f8a-12dc-4b79-a12c-f1ceef92981f
+# ╟─69a34fdf-e15c-4a5c-9249-a8106a80a489
+# ╠═c9ba7552-0a62-4425-9150-5ad3fd8ac5da
+# ╟─589fe43b-5f30-4081-9433-c89f286432c9
+# ╠═c8782cb3-d42a-40f6-a788-8163025e9c50
+# ╟─37f90e79-4150-48ec-b34f-18bd0331bd17
+# ╠═69910123-e70c-4cbf-bbff-6747b62e8980
+# ╠═ecc33216-47f2-4c28-8ff7-2d74f102240c
+# ╟─c609c2c8-5dae-43a3-9c69-0ef6ef94c7ff
+# ╠═9c9b5d86-c387-4ecb-a151-530d628aeb74
+# ╟─ad192426-69a3-49a1-8f97-c1eaf8894bfb
+# ╠═a4e516f6-2e79-4411-a6d9-66ad0df86791
+# ╟─dce5d1b9-40dc-43bc-b496-3faf152c4909
+# ╠═4b1c8642-0d43-4765-8bd1-c55fe5309f22
+# ╟─6d08a15a-b878-4ad0-93a6-15595e3e097b
+# ╠═a764fcd0-04cc-49e1-a5d4-df08a20b8716
+# ╠═4567e8ca-003b-4128-a778-1d4dd421fdfa
+# ╠═a49fabdd-b34f-4ad4-97cc-3b85a60e6487
+# ╟─231baeb1-1b04-4cc2-a061-59e6d7ca0980
+# ╠═5ff47949-68d2-4632-8666-4ca7d340595e
+# ╠═a190ae62-c605-477d-825a-4f024cfa6dc6
+# ╠═09871353-2148-40b8-8d16-16373f827fba
+# ╠═662b4c82-de3d-43cc-b20a-db9d9c898f2a
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
