@@ -166,6 +166,9 @@ We can also make all this interactive!
 # ╔═╡ a190ae62-c605-477d-825a-4f024cfa6dc6
 @bind rate Slider(1:.1:5, show_value = true)
 
+# ╔═╡ 50ebd2a2-033b-4027-ba9b-ac087ae25d1a
+rate
+
 # ╔═╡ 09871353-2148-40b8-8d16-16373f827fba
 sol_variable = solve(
 	x -> -rate * x;
@@ -605,8 +608,9 @@ version = "17.4.0+0"
 # ╠═a49fabdd-b34f-4ad4-97cc-3b85a60e6487
 # ╟─231baeb1-1b04-4cc2-a061-59e6d7ca0980
 # ╠═5ff47949-68d2-4632-8666-4ca7d340595e
-# ╠═a190ae62-c605-477d-825a-4f024cfa6dc6
+# ╠═50ebd2a2-033b-4027-ba9b-ac087ae25d1a
 # ╠═09871353-2148-40b8-8d16-16373f827fba
+# ╠═a190ae62-c605-477d-825a-4f024cfa6dc6
 # ╠═662b4c82-de3d-43cc-b20a-db9d9c898f2a
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
