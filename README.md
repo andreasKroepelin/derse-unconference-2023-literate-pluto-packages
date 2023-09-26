@@ -48,7 +48,7 @@ julia
 
 ### Package management
 
-Julia package management ist built around environments. We will explore
+Julia package management is built around environments. We will explore
 
 * what defines an environment in Julia
 * how to create different environments for different projects
@@ -74,16 +74,31 @@ we will **not** discuss in detail:
 
 ## Pluto notebooks
 
-### Running pluto
+We will use Pluto.jl notebooks for the rest of the workshop.
+You can install Pluto [here](https://plutojl.org/#install).
+To follow the paradigm of [literate programming](https://en.wikipedia.org/wiki/Literate_programming),
+we will explore the following concepts in Pluto notebooks:
 
-    writing code
-    adding text
-    visualising results
-    adding interactivity (PlutoUI.jl)
-    exporting static HTML
+- writing code
+- adding Markdown formatted text
+- reactive behaviour (think spreadsheets)
+- notebooks are code files
+- plotting results
+- interactivity (using [`PlutoUI.jl` package](https://github.com/JuliaPluto/PlutoUI.jl))
+- package management in Pluto
+- exporting static HTML
 
 ## Creating a Julia package made of notebooks
 
-### combining different files/notebooks using PlutoDevMacros.jl
+Finally, we will combine all the previously gained knowledge to use Pluto to
+create literate Julia packages.
+Central ingredients are the [`PlutoDevMacros.jl`](https://github.com/disberd/PlutoDevMacros.jl)
+and [`PlutoTest.jl`](https://github.com/JuliaPluto/PlutoTest.jl) packages.
+With them, we can
 
-### Interactive tests using PlutoTest.jl
+- have code in the notebook (e.g. explorative and interactive elements) that is
+  not part of the package
+- differentiate between dependencies of our package and those that are only used
+  for interactivity in the notebook
+- split up our package into multiple files
+- add interactive testing
