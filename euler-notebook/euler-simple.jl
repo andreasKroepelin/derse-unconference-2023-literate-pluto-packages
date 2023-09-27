@@ -25,7 +25,7 @@ using PlutoUI
 
 # ╔═╡ 1e2864a8-40f3-45fa-96b4-1e5db6c96bed
 md"""
-# My implementation of Differential Equation Solving
+# Differential Equation Solving
 
 This notebook serves as a demonstration of Pluto.jl notebooks.
 """
@@ -83,7 +83,7 @@ sol = solve_raw(
 
 # ╔═╡ 589fe43b-5f30-4081-9433-c89f286432c9
 md"""
-The solution should come close to zero.
+The solution should approach zero.
 """
 
 # ╔═╡ c8782cb3-d42a-40f6-a788-8163025e9c50
@@ -164,10 +164,7 @@ We can also make all this interactive!
 """
 
 # ╔═╡ a190ae62-c605-477d-825a-4f024cfa6dc6
-@bind rate Slider(1:.1:5, show_value = true)
-
-# ╔═╡ 50ebd2a2-033b-4027-ba9b-ac087ae25d1a
-rate
+@bind rate Slider(.1:.1:5, show_value = true)
 
 # ╔═╡ 09871353-2148-40b8-8d16-16373f827fba
 sol_variable = solve(
@@ -608,7 +605,6 @@ version = "17.4.0+0"
 # ╠═a49fabdd-b34f-4ad4-97cc-3b85a60e6487
 # ╟─231baeb1-1b04-4cc2-a061-59e6d7ca0980
 # ╠═5ff47949-68d2-4632-8666-4ca7d340595e
-# ╠═50ebd2a2-033b-4027-ba9b-ac087ae25d1a
 # ╠═09871353-2148-40b8-8d16-16373f827fba
 # ╠═a190ae62-c605-477d-825a-4f024cfa6dc6
 # ╠═662b4c82-de3d-43cc-b20a-db9d9c898f2a
