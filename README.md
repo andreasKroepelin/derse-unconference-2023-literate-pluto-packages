@@ -58,7 +58,7 @@ More information can be found in the [manual for Julia's included package manage
 
 ### Creating a Julia package
 
-We will create a [small Julia package](./ExamplePackage/) and learn
+We will create a [small Julia package](./OrthodoxPackage/) and learn
 
 * what defines a Julia package
 * how to build a fully functional Julia package

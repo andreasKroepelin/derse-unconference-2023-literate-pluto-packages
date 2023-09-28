@@ -1,6 +1,6 @@
-# ExamplePackage
+# OrthodoxPackage
 
-This is an example Julia package to demonstrate the directory/file layout.
+This is an example Julia package to demonstrate the directory/file layout that define a julia package.
 
 ## Directory and file layout
 
@@ -14,14 +14,14 @@ A quick overview of the most important files
 * `Manifest.toml` current manifestation of the package environment **for the local checkout** (this is normally not checked in to version control)
 * `test/runtests.jl` a Julia script that serves as the entry point for tests. Tests can then be simply run by a single command in the Julia REPL:
 
-   ```julia
+   ```julia-repl
    ] test
    ```
 
-* `src/ExamplePackage.jl`: A .jl file with the same name as the package, typically containing
+* `src/OrthodoxPackage.jl`: A .jl file with the same name as the package, typically containing
 
     ```julia
-    module ExamplePackage
+    module OrthodoxPackage
     using SomePackage, AnotherPackage  # imports dependencies
 
     include("code_file.jl")
